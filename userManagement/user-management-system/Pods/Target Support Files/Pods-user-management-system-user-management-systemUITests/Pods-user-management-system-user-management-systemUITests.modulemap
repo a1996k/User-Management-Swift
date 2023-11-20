@@ -1,0 +1,6 @@
+framework module Pods_user_management_system_user_management_systemUITests {
+  umbrella header "Pods-user-management-system-user-management-systemUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}
