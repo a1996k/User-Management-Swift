@@ -1,4 +1,5 @@
 import SwiftUI
+
 struct CreateUserView: View {
     @State private var firstName = ""
     @State private var lastName = ""
@@ -11,6 +12,7 @@ struct CreateUserView: View {
     // Regular expression patterns
     let emailRegex = #"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"#
     let phoneNumberRegex = #"^\d{10}$"#
+    let nameRegex = #"^[a-zA-Z]+$"#
 
     @State private var isShowingAlert = false
     @State private var alertTitle = ""
@@ -22,7 +24,14 @@ struct CreateUserView: View {
             Form {
                 Section(header: Text("User Information")) {
                     TextField("First Name", text: $firstName)
+                        .textContentType(.givenName)
+                        .keyboardType(.namePhonePad)
+                        .padding(.vertical, 8)
+
                     TextField("Last Name", text: $lastName)
+                        .textContentType(.familyName)
+                        .keyboardType(.namePhonePad)
+                        .padding(.vertical, 8)
 
                     TextField("Email", text: $email)
                         .textContentType(.emailAddress)
@@ -39,12 +48,20 @@ struct CreateUserView: View {
                     Button("Create User") {
                         // Check for valid email and phone number before creating user
                         if isValidInput(email, regex: emailRegex) && isValidInput(phoneNumber, regex: phoneNumberRegex) {
-                            createUserManager.createUser(firstName: firstName, lastName: lastName, email: email, phoneNumber: phoneNumber)
+                            // Check for valid first name and last name
+                            if isValidInput(firstName, regex: nameRegex) && isValidInput(lastName, regex: nameRegex) {
+                                createUserManager.createUser(firstName: firstName, lastName: lastName, email: email, phoneNumber: phoneNumber)
 
-                            // Show success alert with completion to switch view
-                            showAlertWithCompletion(title: "Success", message: "User created successfully") {
-                                shouldReset = true // Set the flag to reset the form
-                                presentationMode.wrappedValue.dismiss()
+                                // Show success alert with completion to switch view
+                                showAlertWithCompletion(title: "Success", message: "User created successfully") {
+                                    shouldReset = true // Set the flag to reset the form
+                                    presentationMode.wrappedValue.dismiss()
+                                }
+                            } else {
+                                // Handle invalid first name or last name
+                                alertTitle = "Invalid Name"
+                                alertMessage = "Please enter a valid first name and last name."
+                                isShowingAlert = true
                             }
                         } else {
                             // Handle invalid input, e.g., show an alert or update UI
